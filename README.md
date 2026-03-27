@@ -145,8 +145,6 @@ Przykładowa odpowiedź błędu (application/problem+json):
 2. `GET /api/notes/{id}` -> otrzymasz notatkę.
 3. Ponów `GET /api/notes/{id}` -> dostaniesz `404`.
 
-## Struktura projektu (najważniejsze pliki)
-
 ## System szyfrowania notatek
 
 Wszystkie notatki są szyfrowane symetrycznie przed zapisaniem do bazy danych.
@@ -176,6 +174,8 @@ Wszystkie notatki są szyfrowane symetrycznie przed zapisaniem do bazy danych.
 - Szyfrowanie chroni treść notatki nawet w przypadku wycieku bazy
 - Klucz powinien być przechowywany poza repozytorium (np. w sekrecie CI/CD lub .env)
 - Zmiana klucza wymaga migracji danych lub wersjonowania notatek
+
+## Struktura projektu (najważniejsze pliki)
 
 - [src/main/java/pl/pawelcz/AnonyNote/note/NoteController.java](src/main/java/pl/pawelcz/AnonyNote/note/NoteController.java)
 - [src/main/java/pl/pawelcz/AnonyNote/note/NoteServiceImpl.java](src/main/java/pl/pawelcz/AnonyNote/note/NoteServiceImpl.java)
