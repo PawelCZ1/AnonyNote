@@ -14,57 +14,74 @@ Prosta aplikacja Spring Boot do tworzenia anonimowych notatek.
 - Spring Boot 4
 - Spring Web MVC
 - Spring Data MongoDB
-- MongoDB (Docker Compose)
+- MongoDB
+- Docker Compose (aplikacja + baza)
 
 ## Wymagania
 
-- Docker Desktop
+- Docker
 - Java 17
-- (opcjonalnie) Maven lokalnie, ale wystarczy `mvnw` z repo
+- (opcjonalnie) Maven lokalnie, ale wystarczy mvnw z repo
 
-## Uruchomienie lokalne
+## Uruchomienie w kontenerach (zalecane)
 
-### 1) Uruchom MongoDB z Docker Compose
+1. Zbuduj i uruchom aplikację oraz bazę danych:
 
-Upewnij się, że w `compose.yaml` masz stałe mapowanie portu:
+  docker compose up --build -d
 
-```yaml
-ports:
-  - "27017:27017"
-```
+2. Sprawdź status kontenerów:
 
-Następnie uruchom kontener:
+  docker compose ps
 
-```powershell
-docker compose up -d
-docker compose ps
-```
+3. Podgląd logów aplikacji:
 
-### 2) Skonfiguruj połączenie do MongoDB
+  docker compose logs -f app
 
-W `src/main/resources/application.properties` ustaw:
+4. Zatrzymanie środowiska:
 
-```properties
-spring.application.name=AnonyNote
-spring.data.mongodb.uri=mongodb://root:secret@localhost:27017/mydatabase?authSource=admin
-spring.data.mongodb.uuid-representation=standard
-```
+  docker compose down
 
-> `uuid-representation=standard` jest wymagane przy `UUID` jako `@Id`.
+Usługi i porty:
+- app: http://localhost:8080
+- mongodb: localhost:27017
 
-### 3) Uruchom aplikację
+## Uruchomienie lokalne (bez kontenera aplikacji)
 
-```powershell
-.\mvnw.cmd spring-boot:run
-```
+1. Uruchom samą bazę MongoDB:
 
-Aplikacja domyślnie startuje na `http://localhost:8080`.
+  docker compose up -d mongodb
+
+2. Upewnij się, że używasz Java 17.
+
+3. Uruchom aplikację z repozytorium:
+
+  Linux/macOS:
+  ./mvnw spring-boot:run
+
+  Windows:
+  .\\mvnw.cmd spring-boot:run
+
+Aplikacja domyślnie startuje na http://localhost:8080.
+
+Uwaga:
+- w kontenerach aplikacja łączy się z bazą przez nazwę usługi mongodb
+- lokalnie aplikacja używa domyślnego URI z pliku konfiguracyjnego
+
+## Konfiguracja
+
+Domyślna konfiguracja znajduje się w [src/main/resources/application.properties](src/main/resources/application.properties).
+
+URI bazy:
+- spring.mongodb.uri=${SPRING_MONGODB_URI:${SPRING_DATA_MONGODB_URI:mongodb://root:secret@localhost:27017/mydatabase?authSource=admin}}
+
+W Docker Compose ustawiana jest zmienna:
+- SPRING_MONGODB_URI=mongodb://root:secret@mongodb:27017/mydatabase?authSource=admin
 
 ## API
 
-Base path: `/api/notes`
+Base path: /api/notes
 
-### POST `/api/notes`
+### POST /api/notes
 Tworzy notatkę.
 
 Request body:
@@ -75,13 +92,13 @@ Request body:
 }
 ```
 
-Przykład (PowerShell):
+Przykład (curl):
 
-```powershell
-Invoke-RestMethod -Method Post -Uri "http://localhost:8080/api/notes" -ContentType "application/json" -Body '{"content":"To jest tajna notatka"}'
-```
+curl -X POST http://localhost:8080/api/notes \
+  -H "Content-Type: application/json" \
+  -d '{"content":"To jest tajna notatka"}'
 
-Response `201 Created`:
+Response 201 Created:
 
 ```json
 {
@@ -92,16 +109,14 @@ Response `201 Created`:
 
 ---
 
-### GET `/api/notes/{id}`
+### GET /api/notes/{id}
 Pobiera notatkę i od razu ją usuwa.
 
-Przykład:
+Przykład (curl):
 
-```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:8080/api/notes/6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b"
-```
+curl http://localhost:8080/api/notes/6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b
 
-Response `200 OK` (przy pierwszym odczycie):
+Response 200 OK (przy pierwszym odczycie):
 
 ```json
 {
@@ -110,9 +125,9 @@ Response `200 OK` (przy pierwszym odczycie):
 }
 ```
 
-Kolejna próba odczytu tego samego `id` zwróci `404 Not Found`.
+Kolejna próba odczytu tego samego id zwróci 404 Not Found.
 
-Przykładowa odpowiedź błędu (`application/problem+json`):
+Przykładowa odpowiedź błędu (application/problem+json):
 
 ```json
 {
@@ -132,10 +147,10 @@ Przykładowa odpowiedź błędu (`application/problem+json`):
 
 ## Struktura projektu (najważniejsze pliki)
 
-- `src/main/java/pl/pawelcz/AnonyNote/note/NoteController.java`
-- `src/main/java/pl/pawelcz/AnonyNote/note/NoteServiceImpl.java`
-- `src/main/java/pl/pawelcz/AnonyNote/note/NoteRepository.java`
-- `src/main/java/pl/pawelcz/AnonyNote/core/RestExceptionHandler.java`
-- `src/main/resources/application.properties`
-- `compose.yaml`
+- [src/main/java/pl/pawelcz/AnonyNote/note/NoteController.java](src/main/java/pl/pawelcz/AnonyNote/note/NoteController.java)
+- [src/main/java/pl/pawelcz/AnonyNote/note/NoteServiceImpl.java](src/main/java/pl/pawelcz/AnonyNote/note/NoteServiceImpl.java)
+- [src/main/java/pl/pawelcz/AnonyNote/note/NoteRepository.java](src/main/java/pl/pawelcz/AnonyNote/note/NoteRepository.java)
+- [src/main/java/pl/pawelcz/AnonyNote/core/RestExceptionHandler.java](src/main/java/pl/pawelcz/AnonyNote/core/RestExceptionHandler.java)
+- [src/main/resources/application.properties](src/main/resources/application.properties)
+- [compose.yaml](compose.yaml)
 

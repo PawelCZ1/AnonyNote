@@ -1,9 +1,34 @@
 services:
   mongodb:
-    image: 'mongo:latest'
+    image: mongo:7
+    container_name: anonynote-mongodb
     environment:
-      - 'MONGO_INITDB_DATABASE=mydatabase'
-      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
-      - 'MONGO_INITDB_ROOT_USERNAME=root'
+      - MONGO_INITDB_DATABASE=mydatabase
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_ROOT_USERNAME=root
     ports:
       - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anonynote-app
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - SPRING_MONGODB_URI=mongodb://root:secret@mongodb:27017/mydatabase?authSource=admin
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
