@@ -4,6 +4,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import pl.pawelcz.AnonyNote.core.security.EncryptionService;
 import pl.pawelcz.AnonyNote.note.dto.NoteRequest;
 import pl.pawelcz.AnonyNote.note.dto.NoteResponse;
 import pl.pawelcz.AnonyNote.note.exception.NoteNotFoundException;
@@ -17,20 +18,26 @@ public class NoteServiceImpl implements NoteService {
 
     private final NoteRepository noteRepository;
     private final MongoTemplate mongoTemplate;
+    private final EncryptionService encryptionService;
 
-    public NoteServiceImpl(NoteRepository noteRepository, MongoTemplate mongoTemplate) {
+    public NoteServiceImpl(NoteRepository noteRepository, MongoTemplate mongoTemplate,
+                           EncryptionService encryptionService) {
         this.noteRepository = noteRepository;
         this.mongoTemplate = mongoTemplate;
+        this.encryptionService = encryptionService;
     }
 
     @Override
     public NoteResponse addNote(NoteRequest request) {
+        String encryptedContent = encryptionService.encrypt(request.content());
         Note note = Note.builder()
                 .id(UUID.randomUUID())
-                .content(request.content())
+            .content(encryptedContent)
                 .expiresAt(Instant.now().plus(7, ChronoUnit.DAYS))
                 .build();
-        return NoteResponse.fromNote(noteRepository.save(note));
+
+        Note saved = noteRepository.save(note);
+        return new NoteResponse(saved.getId(), request.content());
     }
 
     @Override
@@ -42,6 +49,7 @@ public class NoteServiceImpl implements NoteService {
             throw new NoteNotFoundException(id);
         }
 
-        return NoteResponse.fromNote(removed);
+        String decryptedContent = encryptionService.decrypt(removed.getContent());
+        return new NoteResponse(removed.getId(), decryptedContent);
     }
 }

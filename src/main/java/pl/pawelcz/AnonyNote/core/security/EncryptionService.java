@@ -1,6 +1,6 @@
 package pl.pawelcz.AnonyNote.core.security;
 
-interface EncryptionService {
-    
-    
+public interface EncryptionService {
+    String encrypt(String plainText);
+    String decrypt(String encryptedText);
 }
