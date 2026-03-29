@@ -17,9 +17,9 @@ public class NoteController {
         this.noteService = noteService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<NoteResponse> getNoteByIdAndErase(@PathVariable UUID id) {
-        return ResponseEntity.ok(noteService.getNoteByIdAndErase(id));
+    @GetMapping("/{searchToken}")
+    public ResponseEntity<NoteResponse> getNoteBySearchTokenAndErase(@PathVariable String searchToken) {
+        return ResponseEntity.ok(noteService.getNoteBySearchTokenAndErase(searchToken));
     }
 
     @PostMapping

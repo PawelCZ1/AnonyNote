@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface NoteService {
     NoteResponse addNote(NoteRequest request);
-    NoteResponse getNoteByIdAndErase(UUID id);
+    NoteResponse getNoteBySearchTokenAndErase(String searchToken);
 }

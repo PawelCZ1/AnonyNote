@@ -4,5 +4,5 @@ import pl.pawelcz.AnonyNote.note.Note;
 
 import java.util.UUID;
 
-public record NoteResponse(UUID id, String content) {
+public record NoteResponse(String searchToken, String content) {
 }
