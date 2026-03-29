@@ -145,6 +145,8 @@ Przykładowa odpowiedź błędu (application/problem+json):
 2. `GET /api/notes/{searchToken}` -> otrzymasz notatkę.
 3. Ponów `GET /api/notes/{searchToken}` -> dostaniesz `404`.
 
+**Ważne:** Notatka **nie ulega** automatycznemu przedawnieniu bez interakcji. Zostanie zniszczona (usunięta z bazy) wyłącznie w momencie jej jednorazowego wywołania (odczytu) przez użytkownika.
+
 ## System szyfrowania notatek
 
 Wszystkie notatki są szyfrowane lub hashowane przed zapisaniem do bazy danych, aby zapewnić najwyższy standard poufności.

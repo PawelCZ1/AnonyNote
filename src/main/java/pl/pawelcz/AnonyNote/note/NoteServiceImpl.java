@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.pawelcz.AnonyNote.core.security.EncryptionService;
 import pl.pawelcz.AnonyNote.note.dto.NoteRequest;
 import pl.pawelcz.AnonyNote.note.dto.NoteResponse;
+import pl.pawelcz.AnonyNote.note.exception.NoteExpiredException;
 import pl.pawelcz.AnonyNote.note.exception.NoteNotFoundException;
 
 import java.nio.charset.StandardCharsets;
@@ -55,6 +56,10 @@ public class NoteServiceImpl implements NoteService {
 
         if (removed == null) {
             throw new NoteNotFoundException(searchToken);
+        }
+
+        if (removed.getExpiresAt().isBefore(Instant.now())) {
+            throw new NoteExpiredException();
         }
 
         String decryptedContent = encryptionService.decrypt(removed.getContent());
