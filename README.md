@@ -4,8 +4,8 @@ Prosta aplikacja Spring Boot do tworzenia anonimowych notatek.
 
 ## Co robi aplikacja
 
-- tworzy notatkę i zwraca jej `id`
-- pozwala odczytać notatkę po `id`
+- tworzy notatkę i zwraca jej `searchToken`
+- pozwala odczytać notatkę po `searchToken`
 - po odczycie usuwa notatkę (one-time read)
 
 ## Stack
@@ -102,14 +102,14 @@ Response 201 Created:
 
 ```json
 {
-  "id": "6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b",
+  "searchToken": "6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b",
   "content": "To jest tajna notatka"
 }
 ```
 
 ---
 
-### GET /api/notes/{id}
+### GET /api/notes/{searchToken}
 Pobiera notatkę i od razu ją usuwa.
 
 Przykład (curl):
@@ -120,12 +120,12 @@ Response 200 OK (przy pierwszym odczycie):
 
 ```json
 {
-  "id": "6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b",
+  "searchToken": "6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b",
   "content": "To jest tajna notatka"
 }
 ```
 
-Kolejna próba odczytu tego samego id zwróci 404 Not Found.
+Kolejna próba odczytu tego samego tokenu zwróci 404 Not Found.
 
 Przykładowa odpowiedź błędu (application/problem+json):
 
@@ -134,27 +134,32 @@ Przykładowa odpowiedź błędu (application/problem+json):
   "type": "about:blank",
   "title": "Note Not Found",
   "status": 404,
-  "detail": "Note with id 6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b not found",
+  "detail": "Note with token 6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b not found",
   "instance": "/api/notes/6f4dbd56-96d8-4ca2-a7e8-df8f5e07cb7b"
 }
 ```
 
 ## Szybki test scenariusza
 
-1. `POST /api/notes` i skopiuj `id`.
-2. `GET /api/notes/{id}` -> otrzymasz notatkę.
-3. Ponów `GET /api/notes/{id}` -> dostaniesz `404`.
+1. `POST /api/notes` i skopiuj `searchToken`.
+2. `GET /api/notes/{searchToken}` -> otrzymasz notatkę.
+3. Ponów `GET /api/notes/{searchToken}` -> dostaniesz `404`.
 
 ## System szyfrowania notatek
 
-Wszystkie notatki są szyfrowane symetrycznie przed zapisaniem do bazy danych.
+Wszystkie notatki są szyfrowane lub hashowane przed zapisaniem do bazy danych, aby zapewnić najwyższy standard poufności.
 
-- Algorytm: AES-256-GCM (szyfrowanie + integralność)
-- Każda notatka ma losowy IV (nonce) generowany przy zapisie
-- Szyfrowanie i deszyfrowanie realizuje serwis: [AesGcmEncryptionService](src/main/java/pl/pawelcz/AnonyNote/core/security/AesGcmEncryptionService.java)
-- Interfejs: [EncryptionService](src/main/java/pl/pawelcz/AnonyNote/core/security/EncryptionService.java)
-- Szyfrowanie jest w pełni transparentne dla API – użytkownik nigdy nie widzi ciphertextu
-- W bazie MongoDB pole `content` przechowuje zaszyfrowany tekst zakodowany Base64 (IV + ciphertext + tag)
+- **Treść notatki (Content):**
+  - Algorytm: AES-256-GCM (zapewnia szyfrowanie oraz integralność danych)
+  - Każda notatka ma unikalny, losowy wektor inicjalizujący (IV / nonce) generowany przy zapisie. Dzięki temu te same treści dają różny kryptogram.
+  - Szyfrowanie i deszyfrowanie realizuje serwis: [AesGcmEncryptionService](src/main/java/pl/pawelcz/AnonyNote/core/security/AesGcmEncryptionService.java)
+  - Szyfrowanie jest w pełni transparentne dla API – użytkownik nigdy nie widzi ciphertextu
+  - W bazie MongoDB pole `content` przechowuje zaszyfrowany tekst zakodowany Base64 (IV + ciphertext + tag)
+
+- **Token wyszukiwania (Search Token):**
+  - Tokeny służące do jednorazowego odczytu notatki nie są przechowywane w bazie w postaci jawnej.
+  - Są one **hashowane** przy użyciu algorytmu SHA-256 z kodowaniem Base64.
+  - Dzięki temu, nawet w przypadku wycieku bazy danych, atakujący nie pozna oryginalnych linków/tokenów uprawniających do odczytu notatek. Notatki mogą zostać odczytane wyłącznie przez osobę posiadającą wygenerowany wcześniej `searchToken`.
 
 ### Konfiguracja klucza szyfrowania
 
