@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Note Created</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="success">Note Created Successfully!</h1>
+        <p class="warning">Warning: The note will self-destruct after it is read.</p>
+        <p>Share the following link with the intended recipient:</p>
+        
+        <div class="link-box" id="noteUrlBox">
+            <a th:href="@{/note/{token}(token=${searchToken})}" id="noteLink" th:text="'/note/' + ${searchToken}">Link</a>
+        </div>
+        
+        <a th:href="@{/}" class="action-link">Create another note</a>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var token = /*[[${searchToken}]]*/ 'default';
+        var url = window.location.origin + '/note/' + token;
+        var noteLink = document.getElementById('noteLink');
+        noteLink.href = url;
+        noteLink.innerText = url;
+        /*]]>*/
+    </script>
+</body>
+</html>

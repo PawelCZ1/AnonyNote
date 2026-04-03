@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create AnonyNote</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Create a Secret Note</h1>
+        <p>Your note will be encrypted and will self-destruct after it's read.</p>
+        
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+        
+        <form th:action="@{/}" method="post">
+            <textarea id="content" name="content" placeholder="Enter your secret message here..." required></textarea>
+            <button type="submit">Create Note</button>
+        </form>
+    </div>
+</body>
+</html>

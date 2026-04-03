@@ -1,18 +1,33 @@
 # AnonyNote
 
-Prosta aplikacja Spring Boot do tworzenia anonimowych notatek.
+Prosta aplikacja Spring Boot do tworzenia anonimowych notatek, wyposażona w przyjazny interfejs graficzny (Frontend).
 
 ## Co robi aplikacja
 
-- tworzy notatkę i zwraca jej `searchToken`
-- pozwala odczytać notatkę po `searchToken`
+- tworzy notatkę i zwraca jej link / `searchToken`
+- pozwala odczytać notatkę po wejściu w link lub po podaniu `searchToken` w API
 - po odczycie usuwa notatkę (one-time read)
+
+## Interfejs Graficzny (Frontend UI)
+
+Aplikacja posiada prosty i nowoczesny interfejs użytkownika wyrenderowany po stronie serwera za pomocą silnika szablonów **Thymeleaf**.
+
+Aby skorzystać z frontendu:
+1. Uruchom aplikację.
+2. Wejdź w przeglądarce na adres: **http://localhost:8080/**
+3. Zobaczysz prosty formularz, gdzie możesz wpisać swoją tajną wiadomość i wygenerować jednorazowy link do notatki.
+4. Wygenerowany link prowadzi na adres `http://localhost:8080/note/{searchToken}`. Skopiuj go i wyślij odbiorcy.
+
+Frontend oparty jest na HTML5, responsywnym CSS oraz szablonach Thymeleaf:
+- Pliki HTML (widoki) znajdują się w: `src/main/resources/templates/`
+- Wspólne style CSS zostały wydzielone do: `src/main/resources/static/css/styles.css`
 
 ## Stack
 
 - Java 17
 - Spring Boot 4
 - Spring Web MVC
+- Thymeleaf (Frontend / Server-Side Rendering)
 - Spring Data MongoDB
 - MongoDB
 - Docker Compose (aplikacja + baza)

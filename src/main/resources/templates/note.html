@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>View Note</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Secret Note</h1>
+        <div class="warning-box">
+            This note has now been destroyed. You will not be able to view it again.
+        </div>
+        
+        <div class="note-content" th:text="${content}">
+            Note content goes here...
+        </div>
+        
+        <a th:href="@{/}" class="action-link">Create your own note</a>
+    </div>
+</body>
+</html>
