@@ -87,7 +87,7 @@ Uwaga:
 Domyślna konfiguracja znajduje się w [src/main/resources/application.properties](src/main/resources/application.properties).
 
 URI bazy:
-- spring.mongodb.uri=${SPRING_MONGODB_URI:${SPRING_DATA_MONGODB_URI:mongodb://root:secret@localhost:27017/mydatabase?authSource=admin}}
+`spring.mongodb.uri=${SPRING_MONGODB_URI:${SPRING_DATA_MONGODB_URI:mongodb://root:secret@localhost:27017/mydatabase?authSource=admin}}`
 
 W Docker Compose ustawiana jest zmienna:
 - SPRING_MONGODB_URI=mongodb://root:secret@mongodb:27017/mydatabase?authSource=admin
