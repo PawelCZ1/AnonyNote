@@ -20,9 +20,9 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        var token = /*[[${searchToken}]]*/ 'default';
-        var url = window.location.origin + '/note/' + token;
-        var noteLink = document.getElementById('noteLink');
+        const token = /*[[${searchToken}]]*/ 'default';
+        const url = window.location.origin + '/note/' + token;
+        const noteLink = document.getElementById('noteLink');
         noteLink.href = url;
         noteLink.innerText = url;
         /*]]>*/
